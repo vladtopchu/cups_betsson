@@ -38,10 +38,38 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        if (sharedPref.getTargetLink() != null && sharedPref.getTargetLink() == TEST_URL) {
+        if(sharedPref.getTargetLink() != null && sharedPref.getTargetLink() == TEST_URL){
+            Timber.d("STARTPLUG 1")
             startPlug()
         } else {
-            webViewLogic()
+            connectionLiveData = ConnectionLiveData(this)
+            connectionLiveData.observe(this) {
+                Timber.d("CONNECTION STATUS::: $it")
+                when(it) {
+                    true -> {
+                        handler.removeCallbacksAndMessages(null)
+                        if(sharedPref.getTargetLink() == null){
+                            webViewLogic()
+                        } else {
+                            if(sharedPref.getTargetLink() == TEST_URL){
+                                startPlug()
+                            } else {
+                                webViewLogic()
+                            }
+                        }
+                    }
+                    false, null -> {
+                        handler.postDelayed({
+                            if(connectionLiveData.value == true){
+                                webViewLogic()
+                            } else {
+                                Timber.d("TIMEOUT:::")
+                                startPlug()
+                            }
+                        }, 4000)
+                    }
+                }
+            }
         }
     }
 
