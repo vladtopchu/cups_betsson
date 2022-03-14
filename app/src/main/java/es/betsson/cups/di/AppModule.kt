@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import es.betsson.cups.utils.ConnectionLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import es.betsson.cups.utils.SharedPref
@@ -17,6 +18,12 @@ import javax.inject.Singleton
 @Module()
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+    @Provides
+    @Singleton
+    fun provideConnectionLivedata(
+        @ApplicationContext context: Context
+    ) = ConnectionLiveData(context)
 
     @ApplicationScope
     @Provides

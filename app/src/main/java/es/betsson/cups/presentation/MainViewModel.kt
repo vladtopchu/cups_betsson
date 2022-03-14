@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import es.betsson.cups.utils.SharedPref
 import es.betsson.cups.utils.asLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import es.betsson.cups.utils.AppState
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import timber.log.Timber
@@ -17,29 +18,12 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val sharedPref: SharedPref,
 ): ViewModel() {
+    val state = MutableLiveData<AppState>(AppState.PrevCheck())
 
-    var isRequestSend = false
+    private var _connectionStatus = MutableLiveData<Boolean>(null)
+    val connectionStatus = _connectionStatus.asLiveData()
 
-    val _error = MutableLiveData(false)
-    val _errorWasSet = MutableLiveData(false)
-
-    private val _response: MutableLiveData<String> = MutableLiveData(null)
-    val response = _response.asLiveData()
-
-    fun sendRequest() {
-        isRequestSend = true
-        viewModelScope.launch {
-            try {
-//                val serverResponse = apiService.getLink(requestLinkBody)
-//                _response.postValue(serverResponse.link)
-//                sharedPref.setTrackerUrl(serverResponse.link)
-            } catch(e: HttpException){
-                Timber.e(e)
-                _error.postValue(true)
-            } catch(e: Exception) {
-                Timber.e(e)
-                _error.postValue(true)
-            }
-        }
+    fun connectionController(state: Boolean) {
+        _connectionStatus.postValue(state)
     }
 }
